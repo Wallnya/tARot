@@ -7,14 +7,37 @@ namespace tARot
     public class Card : MonoBehaviour
     {
         protected string suit;
-        protected string cardvalue;
+        protected int cardvalue;
+        protected bool isHighlighted = false;
+
         public Card()
         {
         }
-        public Card(string suit2, string cardvalue2)
+
+        public Card(string suit2, int cardvalue2)
         {
             suit = suit2;
             cardvalue = cardvalue2;
+        }
+
+        public string getSuit()
+        {
+            return suit;
+        }
+
+        public int getValue()
+        {
+            return cardvalue;
+        }
+
+        public void setHighlight(bool highlight)
+        {
+            isHighlighted = highlight;
+        }
+
+        public bool isAtout()
+        {
+            return suit.ToLower() == "atout";
         }
 
         public override string ToString()

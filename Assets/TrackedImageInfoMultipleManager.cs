@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,6 +31,12 @@ namespace tARot
 
         private Dictionary<string, GameObject> arObjects = new Dictionary<string, GameObject>();
         public HashSet<Card> cards = new HashSet<Card>();
+        public HashSet<Card> cardsToPlay = new HashSet<Card>();
+        public HashSet<Card> trumps = new HashSet<Card>();
+        public HashSet<Card> spades = new HashSet<Card>();
+        public HashSet<Card> hearts = new HashSet<Card>();
+        public HashSet<Card> diamonds = new HashSet<Card>();
+        public HashSet<Card> clubs = new HashSet<Card>();
 
         void Awake()
         {
@@ -85,7 +92,7 @@ namespace tARot
 
             string[] subs = trackedImage.referenceImage.name.Split('-');
 
-            Card card = new Card(subs[0], subs[1]);
+            Card card = new Card(subs[0], Int32.Parse(subs[1]));
 
             cards.Add(card);
             
@@ -133,6 +140,66 @@ namespace tARot
             }
 
             Debug.Log($"trackedImage.referenceImage.name: {trackedImage.referenceImage.name}");
+        }
+
+        // not ysed at the moment
+        private void splitHand()
+        {
+            foreach (Card card in cards) {
+                switch (card.getSuit())
+                {
+                    case "atout":
+                        trumps.Add(card);
+                        break;
+                    case "spade":
+                        spades.Add(card);
+                        break;
+                    case "heart":
+                        hearts.Add(card);
+                        break;
+                    case "diamond":
+                        diamonds.Add(card);
+                        break;
+                    case "club":
+                        clubs.Add(card);
+                        break;
+                }
+            }
+            // TODO: order hashsets
+        }
+
+        // check if we have at least one card of the suit asked
+        private bool checkSuit(Card gameCard)
+        {
+            foreach (Card handCard in cards)
+            {
+                if (handCard.getSuit() == gameCard.getSuit())
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // function to trigger after scaning gameCard, it will set the HashSet of cards that we can play
+        private void isPlayable(Card gameCard)
+        {
+            cardsToPlay.Clear();
+            bool haveSuit = checkSuit(gameCard);
+
+            foreach (Card handCard in cards)
+            {
+                if (haveSuit && (handCard.getSuit() == gameCard.getSuit()))
+                {
+                    cardsToPlay.Add(handCard);
+                    if (handCard.getValue() > gameCard.getValue()) handCard.setHighlight(true);
+                }
+                else if (!haveSuit && handCard.isAtout())
+                {
+                    cardsToPlay.Add(handCard);
+                    handCard.setHighlight(true);
+                }
+            }
         }
 
     }
