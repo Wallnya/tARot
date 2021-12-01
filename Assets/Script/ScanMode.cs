@@ -2,17 +2,22 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.ARFoundation;
+using UnityEngine.SceneManagement;
 
 namespace tARot
 {
     [RequireComponent(typeof(ARTrackedImageManager))]
-    public class TrackedImageInfoMultipleManager : MonoBehaviour
-    {
+    public class ScanMode : MonoBehaviour{
+        private GameManager GM;
+
         [SerializeField]
         private GameObject welcomePanel;
 
         [SerializeField]
         private Button dismissButton;
+
+        [SerializeField]
+        private Button gameMode;
 
         [SerializeField]
 
@@ -31,55 +36,55 @@ namespace tARot
         private Dictionary<string, GameObject> arObjects = new Dictionary<string, GameObject>();
         public HashSet<Card> cards = new HashSet<Card>();
 
-        void Awake()
+        public void Start()
         {
+            GM = FindObjectOfType<GameManager>();
+        }
+
+        void Awake(){
             dismissButton.onClick.AddListener(Dismiss);
+            gameMode.onClick.AddListener(GameMode);
             m_TrackedImageManager = GetComponent<ARTrackedImageManager>();
 
             // setup all game objects in dictionary
-            foreach (GameObject arObject in arObjectsToPlace)
-            {
+            foreach (GameObject arObject in arObjectsToPlace){
                 GameObject newARObject = Instantiate(arObject, Vector3.zero, Quaternion.identity);
                 newARObject.name = arObject.name;
                 arObjects.Add(arObject.name, newARObject);
             }
         }
 
-        void OnEnable()
-        {
+        void OnEnable(){
             m_TrackedImageManager.trackedImagesChanged += OnTrackedImagesChanged;
         }
 
-        void OnDisable()
-        {
+        void OnDisable(){
             m_TrackedImageManager.trackedImagesChanged -= OnTrackedImagesChanged;
         }
 
         private void Dismiss() => welcomePanel.SetActive(false);
+        
+        private void GameMode() {
+            SceneManager.LoadScene("GameMode");
+        }
 
-        void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs eventArgs)
-        {
-            foreach (ARTrackedImage trackedImage in eventArgs.added)
-            {
+        void OnTrackedImagesChanged(ARTrackedImagesChangedEventArgs eventArgs){
+            foreach (ARTrackedImage trackedImage in eventArgs.added){
                 UpdateARImageAdded(trackedImage);
             }
 
-            foreach (ARTrackedImage trackedImage in eventArgs.updated)
-            {
-                if (trackedImage.trackingState == UnityEngine.XR.ARSubsystems.TrackingState.Tracking)
-                {
+            foreach (ARTrackedImage trackedImage in eventArgs.updated){
+                if (trackedImage.trackingState == UnityEngine.XR.ARSubsystems.TrackingState.Tracking){
                     UpdateARImageUpdated(trackedImage);
                 }
             }
 
-            foreach (ARTrackedImage trackedImage in eventArgs.removed)
-            {
+            foreach (ARTrackedImage trackedImage in eventArgs.removed){
                 arObjects[trackedImage.referenceImage.name].SetActive(false);
             }
         }
 
-        private void UpdateARImageAdded(ARTrackedImage trackedImage)
-        {
+        private void UpdateARImageAdded(ARTrackedImage trackedImage){
             // Display the name of the tracked image in the canvas
             imageTrackedText.text = trackedImage.referenceImage.name;
 
@@ -94,11 +99,9 @@ namespace tARot
             goARObject.transform.position = trackedImage.transform.position;
             goARObject.SetActive(true);
 
-            foreach (GameObject go in arObjects.Values)
-            {
+            foreach (GameObject go in arObjects.Values){
                 Debug.Log($"Go in arObjects.Values: {go.name}");
-                if (go.name != trackedImage.referenceImage.name)
-                {
+                if (go.name != trackedImage.referenceImage.name){
                     Debug.Log($"Go in arObjects.Values DESACTIVATED: {go.name}");
                     go.SetActive(false);
                 }
@@ -111,10 +114,9 @@ namespace tARot
              {
                  Debug.Log($"cards: {i.ToString()}");
              }*/
-            imageCardsText.text = "Cards " + cards.Count + "/10";
+            imageCardsText.text = "Cards " + cards.Count + "/"+ GM.maxCards;
         }
-        private void UpdateARImageUpdated(ARTrackedImage trackedImage)
-        {
+        private void UpdateARImageUpdated(ARTrackedImage trackedImage){
             // Display the name of the tracked image in the canvas
             imageTrackedText.text = trackedImage.referenceImage.name;
 

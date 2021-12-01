@@ -3,31 +3,34 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class MainMenu : MonoBehaviour
-{
-    private int nbPlayers = 4;
+namespace tARot{
+    public class MainMenu : MonoBehaviour{
+        private GameManager GM;
 
-    public void PlayGame()
-    {
-        Debug.Log("nb joueurs :"+nbPlayers);
-        SceneManager.LoadScene("ImageTrackingExtendedMultiple");
-    }
+        public void Start(){
+            GM = FindObjectOfType<GameManager>();
+        }
 
-    public void NbPlayers4()
-    {
+        public void PlayGame(){
+            Debug.Log("nb joueurs :" + GM.nbPlayers);
+            SceneManager.LoadScene("ScanMode");
+        }
 
-        Debug.Log("4 joueurs");
-        nbPlayers = 4;
-    }
+        public void NbPlayers4(){
+            Debug.Log("4 joueurs");
+            GM.nbPlayers = 4;
+            GM.maxCards = 3;
+        }
 
-    public void NbPlayers3()
-    {
-        Debug.Log("3 joueurs");
-        nbPlayers = 3;
-    }
+        public void NbPlayers3(){
+            Debug.Log("3 joueurs");
+            GM.nbPlayers = 3;
+            GM.maxCards = 3;
 
-    public void QuitGame()
-    {
-        Application.Quit();
+        }
+
+        public void QuitGame(){
+            Application.Quit();
+        }
     }
 }
