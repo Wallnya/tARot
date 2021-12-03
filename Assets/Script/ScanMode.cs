@@ -115,6 +115,7 @@ namespace tARot
                  Debug.Log($"cards: {i.ToString()}");
              }*/
             imageCardsText.text = "Cards " + cards.Count + "/"+ GM.maxCards;
+            GM.cards = cards;
         }
         private void UpdateARImageUpdated(ARTrackedImage trackedImage){
             // Display the name of the tracked image in the canvas

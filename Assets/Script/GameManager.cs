@@ -29,5 +29,6 @@ namespace tARot{
 
         public int nbPlayers = 0;
         public int maxCards = 0;
+        public HashSet<Card> cards = new HashSet<Card>();
     }
 }
